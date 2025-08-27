@@ -1,4 +1,3 @@
-#from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
 
@@ -9,7 +8,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .models import *
 from mistralai import Mistral
-#from mistralai.client import MistralClient
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -22,69 +20,19 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 import requests
 
-API_KEY = "EgUOnMcphwYW8I167T3A4J0keFUtOdIW"
-ENDPOINT = "https://api.mistral.ai/v1/chat/completions"  
-headers = {
-    "Content-Type": "application/json",
-    "api-key": API_KEY
-}
+from nextchats.rag_pipeline import system_usage
 
-
-def get_openai_response(prompt):
-    """payload = {
-        "model": "mistral-large-latest",  # Or use "mistral-medium-latest", "mistral-large-latest"
-        "messages": [
-            {"role": "user", "content": prompt}
-        ],
-        "temperature": 0.7,
-        "max_tokens": 100
-    }"""
-
-    api_key = "EgUOnMcphwYW8I167T3A4J0keFUtOdIW"
-    model = "mistral-large-latest"
-
-    client = Mistral(api_key=api_key)
-
-    chat_response = client.chat.complete(
-        model = model,
-        messages = [
-            {
-                "role": "user",
-                "content": prompt,
-            },
-        ]
-    )
-
-    print(chat_response.choices[0].message.content)
-    return chat_response.choices[0].message.content
-
-
-
+# Defining function for getting response from mistral LLM
 def get_mistral_response(prompt):
-    api_key = "EgUOnMcphwYW8I167T3A4J0keFUtOdIW"
-    model = "mistral-small-latest"
 
-    client = Mistral(api_key=api_key)
-
-    chat_response = client.chat.complete(
-        model = model,
-        messages = [
-            {
-                "role": "user",
-                "content": prompt,
-            },
-        ]
-    )
+    chat_response = system_usage(prompt)
 
     print(chat_response.choices[0].message.content)
     return chat_response.choices[0].message.content
-
-
 
 
 # Create your views here.
 def index(request):
-    #return HttpResponse("Hello, world. You're at the polls index.")
     template = loader.get_template('welcome.html')
     return HttpResponse(template.render())
 
@@ -140,8 +88,6 @@ def login_page(request):
 
 
 
-
-
 # Define a view function for the registration page
 def register_page(request):
     # Check if the HTTP request method is POST (form submission)
@@ -176,6 +122,7 @@ def register_page(request):
     
     # Render the registration page template (GET request)
     return render(request, 'register.html')
+
 
 
 def user_logout(request):
