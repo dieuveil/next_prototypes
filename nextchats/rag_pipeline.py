@@ -110,5 +110,5 @@ def system_usage(query):
     print("Reponse", response)
     return response
 
-system_usage("Une société peut acheter ses propres actions?")
+#system_usage("Une société peut acheter ses propres actions?")
 #load_vectorstore()
