@@ -12,13 +12,13 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from transformers import AutoTokenizer
 
 
-VECTOR_STORE_PATH = "nextchats/vectorstore/faiss_index"
+VECTOR_STORE_PATH = "nextrag/vectorstore/faiss_index"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-VECTOR_STORE_PATH2 = os.path.join(BASE_DIR, "nextevolutions", "nextchats", "vectorstore", "faiss_index")
+VECTOR_STORE_PATH2 = os.path.join(BASE_DIR, "nextevolutions", "nextrag", "vectorstore", "faiss_index")
 
 # Steps 1 : Loading pdf docs and chunking
 def chunking():
-    folder_path = "nextchats/knowledge_base"
+    folder_path = "nextrag/knowledge_base"
     documents = []
 
     # Load documents from the extracted text files
@@ -59,13 +59,13 @@ import os
 from mistralai import Mistral
 
 api_key = "EgUOnMcphwYW8I167T3A4J0keFUtOdIW"
-model = "mistral-medium-latest"
+model = "mistral-small-latest"
 
 
 # Function for loading the vectore store from the disc
 def load_vectorstore():
     embedding_model = getEmbedding()
-    vectorstore = FAISS.load_local("C:/Users/DieuveilMABIROU/Desktop/AI projects/nextevolutions/nextchats/vectorstore/faiss_index", embedding_model, allow_dangerous_deserialization=True)
+    vectorstore = FAISS.load_local("C:/Users/DieuveilMABIROU/Desktop/AI projects/nextevolutions/nextrag/vectorstore/faiss_index", embedding_model, allow_dangerous_deserialization=True)
     return vectorstore
    
    

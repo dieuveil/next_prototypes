@@ -20,15 +20,17 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 import requests
 
-from nextchats.rag_pipeline import system_usage
+from nextrag.rag_pipeline import system_usage
 
 # Defining function for getting response from mistral LLM
 def get_mistral_response(prompt):
 
     chat_response = system_usage(prompt)
 
-    print(chat_response.choices[0].message.content)
-    return chat_response.choices[0].message.content
+    #print(chat_response.choices[0].message.content)
+    #return chat_response.choices[0].message.content
+    print(chat_response)
+    return chat_response
 
 
 @csrf_exempt

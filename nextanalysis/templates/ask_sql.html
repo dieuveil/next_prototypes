@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Assistant SQL IA</title>
+</head>
+<body>
+    <h1>🧠 Assistant SQL avec Mistral</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="question">Pose ta question :</label><br>
+        <input type="text" name="question" id="question" size="80" value="{{ question }}"><br><br>
+        <input type="submit" value="Envoyer">
+    </form>
+
+    {% if response %}
+        <h2>📄 Requête SQL générée :</h2>
+        <pre>{{ sql_query }}</pre>
+
+        <h2>📊 Réponse :</h2>
+        <p>{{ response }}</p>
+    {% endif %}
+</body>
+</html>

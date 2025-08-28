@@ -1,6 +1,5 @@
 from django.http import HttpResponse
 from django.template import loader
-
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -20,19 +19,60 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 import requests
 
-from nextchats.rag_pipeline import system_usage
 
-# Defining function for getting response from mistral LLM
-def get_mistral_response(prompt):
+API_KEY = "EgUOnMcphwYW8I167T3A4J0keFUtOdIW"
+ENDPOINT = "https://api.mistral.ai/v1/chat/completions"  
+headers = {
+    "Content-Type": "application/json",
+    "api-key": API_KEY
+}
 
-    chat_response = system_usage(prompt)
+
+def get_openai_response(prompt):
+    api_key = "EgUOnMcphwYW8I167T3A4J0keFUtOdIW"
+    model = "mistral-large-latest"
+
+    client = Mistral(api_key=api_key)
+
+    chat_response = client.chat.complete(
+        model = model,
+        messages = [
+            {
+                "role": "user",
+                "content": prompt,
+            },
+        ]
+    )
 
     print(chat_response.choices[0].message.content)
     return chat_response.choices[0].message.content
 
 
+
+def get_mistral_response(prompt):
+    api_key = "EgUOnMcphwYW8I167T3A4J0keFUtOdIW"
+    model = "mistral-small-latest"
+
+    client = Mistral(api_key=api_key)
+
+    chat_response = client.chat.complete(
+        model = model,
+        messages = [
+            {
+                "role": "user",
+                "content": prompt,
+            },
+        ]
+    )
+
+    print(chat_response.choices[0].message.content)
+    return chat_response.choices[0].message.content
+
+
+
 # Create your views here.
 def index(request):
+    #return HttpResponse("Hello, world. You're at the polls index.")
     template = loader.get_template('welcome.html')
     return HttpResponse(template.render())
 
@@ -50,11 +90,9 @@ def chat_view(request):
             user_input = request.POST.get('message', '')
             print(user_input)
             #user_input = request.POST.get('user_input')
-            openai_response = get_mistral_response(user_input)
+            openai_response = get_openai_response(user_input)
             return JsonResponse({'message': openai_response})
         return render(request, 'chat.html', context)
-
-
 
 
 

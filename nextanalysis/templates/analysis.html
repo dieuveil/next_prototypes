@@ -130,7 +130,7 @@
                 //alert(userInput);
 
                 $.ajax({
-                    url: '{% url "chat" %}',
+                    url: '{% url "analysis_view" %}',
                     type: 'POST',
                     data: {
                         'message': userInput

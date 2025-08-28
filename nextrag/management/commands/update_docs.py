@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from nextchats.rag_pipeline import build_and_save_vectorstore
+from nextrag.rag_pipeline import build_and_save_vectorstore
 
 class Command(BaseCommand):
     help = "Update vector store with all PDFs in the knowledge base."
