@@ -49,18 +49,14 @@ def ask_sql(request):
 
         # 🔐 API key and DB connection
         mistral_api_key = "EgUOnMcphwYW8I167T3A4J0keFUtOdIW"
-
+        
         # Replace MySQL URI with SQL Server URI
-        # Now using pyodbc directly to connect to SQL Server
-        conn = pyodbc.connect(
-            r"DRIVER={ODBC Driver 18 for SQL Server};"
-            r"SERVER=localhost\SQLEXPRESS;"
-            r"DATABASE=master;"
-            r"Trusted_Connection=yes;"
-            r"TrustServerCertificate=yes;"
-        )
-
+        sql_server_uri = "mssql+pyodbc://sa:0801@localhost\\SQLEXPRESS:1433/master?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes"
+        
         try:
+            # 🔌 Connect to SQL Server using SQLAlchemy
+            db = SQLDatabase.from_uri(sql_server_uri)
+
             # 🤖 Load Mistral model
             llm = ChatMistralAI(
                 api_key=mistral_api_key,
@@ -78,7 +74,7 @@ def ask_sql(request):
             # 🔗 Build SQL chain
             chain = SQLDatabaseChain.from_llm(
                 llm,
-                SQLDatabase(conn),
+                db,
                 verbose=True,
                 return_intermediate_steps=False,  # Don't return intermediate steps
                 prompt=custom_prompt
@@ -94,29 +90,39 @@ def ask_sql(request):
 
             # Now, execute the SQL query using pyodbc
             if sql_query:
-                try:
-                    cursor = conn.cursor()
-                    cursor.execute(sql_query)
+                # Connect to SQL Server using pyodbc
+                connection = pyodbc.connect(
+                    r"DRIVER={ODBC Driver 18 for SQL Server};"
+                    r"SERVER=localhost\SQLEXPRESS;"
+                    r"DATABASE=master;"
+                    r"UID=sa;"
+                    r"PWD=0801;"
+                    r"TrustServerCertificate=yes"
+                )
 
-                    # If it's a SELECT query, fetch the results
-                    if sql_query.strip().lower().startswith('select'):
-                        result_set = cursor.fetchall()
-                        response_text = result_set  # You could format this or display it as needed
-                    else:
-                        # If it's an UPDATE/INSERT/DELETE, we don't fetch data, just give feedback
-                        conn.commit()
-                        response_text = "La requête SQL a été exécutée avec succès."
+                try:
+                    with connection.cursor() as cursor:
+                        # Execute the SQL query
+                        cursor.execute(sql_query)
+
+                        # If it's a SELECT query, fetch the results
+                        if sql_query.strip().lower().startswith('select'):
+                            result_set = cursor.fetchall()
+                            response_text = result_set  # You could format this or display it as needed
+                        else:
+                            # If it's an UPDATE/INSERT/DELETE, we don't fetch data, just give feedback
+                            connection.commit()
+                            response_text = "La requête SQL a été exécutée avec succès."
                 except Exception as e:
                     response_text = f"Erreur lors de l'exécution de la requête SQL : {e}"
+                finally:
+                    connection.close()
 
             else:
                 response_text = "Aucune requête SQL générée."
 
         except Exception as e:
             response_text = f"Erreur lors de la génération de la requête SQL : {e}"
-
-        finally:
-            conn.close()
 
     return render(request, 'ask_sql.html', {
         'question': user_question,
